@@ -1,10 +1,13 @@
 import { getPostBySlug, getPostSlugs } from '@/lib/hygraph'
 import Layout from '@/components/Layout'
 import { remark } from 'remark'
-import html from 'remark-html'
-import slugPlugin from 'remark-slug'
-import autolink from 'remark-autolink-headings'
+import remarkGfm from 'remark-gfm'
+import remarkRehype from 'remark-rehype'
+import rehypeSlug from 'rehype-slug'
+import rehypeAutolinkHeadings from 'rehype-autolink-headings'
+import rehypeStringify from 'rehype-stringify'
 import toc from 'markdown-toc'
+
 import { GetStaticPaths, GetStaticProps } from 'next'
 
 type TocItem = { slug: string; content: string, lvl: number}
@@ -115,10 +118,13 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   // 轉為 HTML
   const processed = await remark()
-    .use(slugPlugin)
-    .use(autolink)
-    .use(html, { sanitize: false })  // ✅ 關鍵修正
+    .use(remarkGfm)
+    .use(remarkRehype) // 將 Markdown 轉為 HAST
+    .use(rehypeSlug) // 自動為 h1~h6 加上 id
+    .use(rehypeAutolinkHeadings) // 為 h1~h6 加上錨點連結
+    .use(rehypeStringify) // 將 HTML AST 轉成 HTML 字串
     .process(postData.content)
+
   const contentHtml = processed.toString()
 
   // 產生 TOC

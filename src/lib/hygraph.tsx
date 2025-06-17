@@ -4,10 +4,40 @@ const endpoint = process.env.HYGRAPH_ENDPOINT!
 
 export const hygraph = new GraphQLClient(endpoint, {
   headers: {
-    Authorization: `Bearer ${process.env.HYGRAPH_TOKEN}`, // 如果有設定 Token
+    Authorization: `Bearer ${process.env.HYGRAPH_TOKEN}`,
   },
 })
 
+// TypeScript 型別定義
+type Post = {
+  title: string
+  slug: string
+  date: string
+  excerpt: string
+  coverImage: {
+    url: string
+  }
+}
+
+type AllPostsResponse = {
+  posts: Post[]
+}
+
+type PostSlugsResponse = {
+  posts: { slug: string }[]
+}
+
+type PostBySlugResponse = {
+  post: {
+    title: string
+    date: string
+    excerpt: string
+    content: string
+    coverImage: { url: string } | null
+  }
+}
+
+// 改為指定型別
 export async function getAllPosts() {
   const query = `
     {
@@ -22,7 +52,7 @@ export async function getAllPosts() {
       }
     }
   `
-  const data = await hygraph.request(query)
+  const data = await hygraph.request<AllPostsResponse>(query)
   return data.posts
 }
 
@@ -34,7 +64,7 @@ export async function getPostSlugs() {
       }
     }
   `
-  const data = await hygraph.request(query)
+  const data = await hygraph.request<PostSlugsResponse>(query)
   return data.posts
 }
 
@@ -54,7 +84,7 @@ export async function getPostBySlug(slug: string) {
   `
 
   const variables = { slug }
-  const data = await hygraph.request(query, variables)
+  const data = await hygraph.request<PostBySlugResponse>(query, variables)
 
   return {
     title: data.post.title,

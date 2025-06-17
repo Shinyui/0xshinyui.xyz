@@ -3,7 +3,21 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getAllPosts } from '@/lib/hygraph'
 
-export default function Home({ posts }) {
+type Post = {
+  title: string
+  slug: string
+  date: string
+  excerpt: string
+  coverImage: {
+    url: string
+  } | null
+}
+
+type HomeProps = {
+  posts: Post[]
+}
+
+export default function Home({ posts }: HomeProps) {
   return (
     <Layout>
       <h1 className="text-3xl font-bold mb-6">最新文章</h1>
