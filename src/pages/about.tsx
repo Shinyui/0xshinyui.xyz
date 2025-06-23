@@ -11,7 +11,7 @@ export default function Profile() {
         {/* 文章區：paragraph 之間用 space-y-* 控距，不必逐段加 mb-4 */}
         <section className="space-y-4 text-gray-700 leading-relaxed text-base sm:text-lg">
           <p>
-            嗨，0xShinyui，一個喜歡把點子變成產品、也願意為使用者多走幾步的 PM。
+            0xShinyui，一個喜歡把點子變成產品、也願意為使用者多走幾步的 PM
           </p>
           <p>
             這幾年，我從寫文案、投廣告、跑數據，一路走到協作工程與設計，把產品從 0
