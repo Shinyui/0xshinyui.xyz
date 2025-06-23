@@ -85,6 +85,7 @@ export default function Post({ post }: PostProps) {
           [&_em]:italic text-gray-600
           [&_blockquote]:border-l-4 [&_blockquote]:border-blue-300 [&_blockquote]:bg-blue-50
           [&_blockquote]:text-gray-600 [&_blockquote]:pl-4 [&_blockquote]:py-2 [&_blockquote]:italic [&_blockquote]:my-6
+          [&_blockquote_p]:mb-0
           [&_ul]:list-disc [&_ul]:ml-6 [&_ul]:mb-4
           [&_ol]:list-decimal [&_ol]:ml-6 [&_ol]:mb-4
           [&_li]:mb-1
