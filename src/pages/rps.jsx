@@ -1,5 +1,3 @@
-// ✅ 卡片邏輯 + 餘額限制 + 正確賠付加成算法（賠付 = 下注金額 * 0.88 * 加成倍率 + 本金）
-
 import { useState, useEffect, useRef } from 'react';
 import sha256 from 'crypto-js/sha256';
 import Layout from '@/components/Layout';
@@ -130,11 +128,11 @@ function App() {
   if (balance <= 0) {
     return (
       <Layout>
-        <div className="p-12 text-center max-w-xl mx-auto">
-          <h1 className="text-2xl font-bold mb-4">小賭怡情，大賭郭台銘</h1>
-          <p className="mb-6 text-gray-700">但你只能下輩子再當了 🪦</p>
+        <div className="p-6 text-center max-w-md mx-auto">
+          <h1 className="text-xl font-bold mb-3">小賭怡情，大賭郭台銘</h1>
+          <p className="mb-4 text-gray-700">但你只能下輩子再當了 🪦</p>
           <button
-            className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600"
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
             onClick={handleReset}
           >
             重新來過
@@ -146,23 +144,23 @@ function App() {
 
   return (
     <Layout>
-      <div className="p-8 max-w-2xl mx-auto">
-        <h1 className="text-2xl font-bold mb-4">剪刀石頭布 🎮</h1>
+      <div className="p-4 max-w-2xl mx-auto text-sm sm:text-base">
+        <h1 className="text-xl sm:text-2xl font-bold mb-4">剪刀石頭布 🎮</h1>
 
-        <div className="mb-6 p-4 bg-gray-50 border rounded text-sm">
+        <div className="mb-6 p-4 bg-gray-50 border rounded">
           <h2 className="font-semibold mb-2">🔍 本遊戲學習目標與設計原理</h2>
           <ul className="list-disc ml-5 space-y-1">
             <li>理解 RNG（隨機數生成）+ Hash 機制如何實現 provably fair 的博弈設計</li>
             <li>學習如何動態追蹤下注行為並計算 RTP</li>
-            <li>了解賠付設計與加成卡機制如何結合遊戲機率模型</li>
+            <li>了解賠付設計如何改變遊戲機率模型</li>
           </ul>
         </div>
 
-        <p>目前餘額：${balance.toFixed(2)}</p>
-        <p>目前累積下注額（本輪運氣值）：{currentSessionBet} / 門檻：{thresholdRef.current.toFixed(0)}</p>
+        <p className="mb-2">💰 餘額：${balance.toFixed(2)}</p>
+        <p className="mb-4">🎯 運氣值累積：{currentSessionBet} / 門檻：{thresholdRef.current.toFixed(0)}</p>
 
         {cardInventory.length > 0 && (
-          <div className="bg-yellow-50 border p-3 rounded my-4">
+          <div className="bg-yellow-50 border p-3 rounded mb-4">
             <p className="font-semibold">🎴 你持有的卡片：</p>
             <div className="flex gap-2 mt-2 flex-wrap">
               {cardInventory.map((card, i) => (
@@ -180,62 +178,66 @@ function App() {
           </div>
         )}
 
-        <div className="flex items-center space-x-2 my-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mb-4">
           <input
             type="number"
             min="1"
             max={balance}
             value={betAmount}
             onChange={(e) => setBetAmount(Math.min(Number(e.target.value), balance))}
-            className="border p-1 w-24"
+            className="border p-1 w-full sm:w-24"
           />
-          {options.map((opt) => (
-            <button
-              key={opt}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              onClick={() => handlePlay(opt)}
-            >
-              出{opt}
-            </button>
-          ))}
+          <div className="flex gap-2">
+            {options.map((opt) => (
+              <button
+                key={opt}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                onClick={() => handlePlay(opt)}
+              >
+                出{opt}
+              </button>
+            ))}
+          </div>
         </div>
 
         {result && (
-          <p>
+          <p className="mb-4">
             結果：你出了 {playerChoice}，系統出了 {systemChoice} →{' '}
             {result === 'win' ? '你贏了！' : result === 'draw' ? '平手' : '你輸了！'}
           </p>
         )}
 
         <h2 className="mt-6 mb-2 text-lg font-semibold">歷史紀錄</h2>
-        <table className="w-full text-sm table-auto border">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="border px-2 py-1">局數</th>
-              <th className="border px-2 py-1">玩家選擇</th>
-              <th className="border px-2 py-1">電腦選擇</th>
-              <th className="border px-2 py-1">下注額</th>
-              <th className="border px-2 py-1">結果</th>
-              <th className="border px-2 py-1">加成</th>
-              <th className="border px-2 py-1">賠付</th>
-              <th className="border px-2 py-1">Hash</th>
-            </tr>
-          </thead>
-          <tbody>
-            {history.slice(-10).reverse().map((h, i) => (
-              <tr key={i} className="text-center">
-                <td className="border px-2 py-1">{h.round}</td>
-                <td className="border px-2 py-1">{h.player}</td>
-                <td className="border px-2 py-1">{h.system}</td>
-                <td className="border px-2 py-1">${h.bet}</td>
-                <td className="border px-2 py-1">{h.outcome === 'win' ? '贏' : h.outcome === 'draw' ? '和局' : '輸'}</td>
-                <td className="border px-2 py-1">{h.bonus}</td>
-                <td className="border px-2 py-1">${h.payout}</td>
-                <td className="border px-2 py-1 break-all text-left">{h.hash}</td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm table-auto border">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="border px-2 py-1">局數</th>
+                <th className="border px-2 py-1">玩家選擇</th>
+                <th className="border px-2 py-1">電腦選擇</th>
+                <th className="border px-2 py-1">下注額</th>
+                <th className="border px-2 py-1">結果</th>
+                <th className="border px-2 py-1">加成</th>
+                <th className="border px-2 py-1">賠付</th>
+                <th className="border px-2 py-1">Hash</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {history.slice(-10).reverse().map((h, i) => (
+                <tr key={i} className="text-center">
+                  <td className="border px-2 py-1">{h.round}</td>
+                  <td className="border px-2 py-1">{h.player}</td>
+                  <td className="border px-2 py-1">{h.system}</td>
+                  <td className="border px-2 py-1">${h.bet}</td>
+                  <td className="border px-2 py-1">{h.outcome === 'win' ? '贏' : h.outcome === 'draw' ? '和局' : '輸'}</td>
+                  <td className="border px-2 py-1">{h.bonus}</td>
+                  <td className="border px-2 py-1">${h.payout}</td>
+                  <td className="border px-2 py-1 break-all text-left">{h.hash}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </Layout>
   );
