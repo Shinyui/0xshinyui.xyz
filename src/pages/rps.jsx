@@ -1,23 +1,24 @@
-import { useState, useEffect, useRef } from 'react';
-import sha256 from 'crypto-js/sha256';
-import Layout from '@/components/Layout';
+import { useState, useEffect, useRef } from "react";
+import sha256 from "crypto-js/sha256";
+import Layout from "@/components/Layout";
 
-const options = ['剪刀', '石頭', '布'];
+const options = ["剪刀", "石頭", "布"];
 
 const cardBonuses = [
-  { cardName: '120% 加成卡', multiplier: 1.2, chance: 0.5 },
-  { cardName: '150% 加成卡', multiplier: 1.5, chance: 0.4 },
-  { cardName: '2000% 加成卡', multiplier: 20.0, chance: 0.1 },
+  { cardName: "120% 加成卡", multiplier: 1.2, chance: 0.5 },
+  { cardName: "150% 加成卡", multiplier: 1.5, chance: 0.4 },
+  { cardName: "2000% 加成卡", multiplier: 20.0, chance: 0.1 },
 ];
 
 function getResult(player, system) {
-  if (player === system) return 'draw';
+  if (player === system) return "draw";
   if (
-    (player === '剪刀' && system === '布') ||
-    (player === '石頭' && system === '剪刀') ||
-    (player === '布' && system === '石頭')
-  ) return 'win';
-  return 'lose';
+    (player === "剪刀" && system === "布") ||
+    (player === "石頭" && system === "剪刀") ||
+    (player === "布" && system === "石頭")
+  )
+    return "win";
+  return "lose";
 }
 
 function getSystemChoice(serverSeed, clientSeed, nonce) {
@@ -43,8 +44,8 @@ function App() {
   const [result, setResult] = useState(null);
   const [balance, setBalance] = useState(10000);
   const [history, setHistory] = useState([]);
-  const [clientSeed, setClientSeed] = useState('');
-  const [serverSeed, setServerSeed] = useState('');
+  const [clientSeed, setClientSeed] = useState("");
+  const [serverSeed, setServerSeed] = useState("");
   const [betAmount, setBetAmount] = useState(100);
   const [cardInventory, setCardInventory] = useState([]);
   const [activeCardIndex, setActiveCardIndex] = useState(null);
@@ -79,7 +80,11 @@ function App() {
     if (betAmount > balance) return;
 
     const nonce = history.length;
-    const { choice: system, hash } = getSystemChoice(serverSeed, clientSeed, nonce);
+    const { choice: system, hash } = getSystemChoice(
+      serverSeed,
+      clientSeed,
+      nonce,
+    );
     const outcome = getResult(choice, system);
     let bonusMultiplier = 0;
     let usedCard = null;
@@ -93,9 +98,9 @@ function App() {
 
     let payout = 0;
     const baseWin = betAmount * 0.88;
-    if (outcome === 'win') {
+    if (outcome === "win") {
       payout = baseWin * bonusMultiplier + betAmount;
-    } else if (outcome === 'draw') {
+    } else if (outcome === "draw") {
       payout = betAmount;
     } else {
       payout = 0;
@@ -114,7 +119,7 @@ function App() {
         bet: betAmount,
         outcome,
         payout: payout.toFixed(2),
-        bonus: bonusMultiplier ? `${usedCard?.cardName}` : '-',
+        bonus: bonusMultiplier ? `${usedCard?.cardName}` : "-",
         hash,
       },
     ]);
@@ -128,11 +133,36 @@ function App() {
   if (balance <= 0) {
     return (
       <Layout>
-        <div className="p-6 text-center max-w-md mx-auto">
-          <h1 className="text-xl font-bold mb-3">小賭怡情，大賭郭台銘</h1>
-          <p className="mb-4 text-gray-700">但你只能下輩子再當了 🪦</p>
+        <div
+          className="p-6 text-center max-w-md mx-auto rounded-lg border"
+          style={{
+            backgroundColor: "var(--card-background)",
+            borderColor: "var(--border-color)",
+            boxShadow: "0 8px 25px var(--shadow-color)",
+          }}
+        >
+          <h1
+            className="text-xl font-bold mb-3"
+            style={{ color: "var(--text-primary)" }}
+          >
+            小賭怡情，大賭郭台銘
+          </h1>
+          <p className="mb-4" style={{ color: "var(--text-secondary)" }}>
+            但你只能下輩子再當了 🪦
+          </p>
           <button
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            className="px-4 py-2 rounded transition-all duration-300 hover:scale-105"
+            style={{
+              backgroundColor: "#dc2626",
+              color: "white",
+              border: "1px solid #dc2626",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#b91c1c";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "#dc2626";
+            }}
             onClick={handleReset}
           >
             重新來過
@@ -145,19 +175,44 @@ function App() {
   return (
     <Layout>
       <div className="p-4 max-w-2xl mx-auto text-sm sm:text-base">
-        <h1 className="text-xl sm:text-2xl font-bold mb-4">剪刀石頭布 🎮</h1>
+        <h1
+          className="text-xl sm:text-2xl font-bold mb-4"
+          style={{ color: "var(--text-primary)" }}
+        >
+          剪刀石頭布 🎮
+        </h1>
 
-        <div className="mb-6 p-4 bg-gray-50 border rounded">
-          <h2 className="font-semibold mb-2">🔍 本遊戲學習目標與設計原理</h2>
-          <ul className="list-disc ml-5 space-y-1">
-            <li>理解 RNG（隨機數生成）+ Hash 機制如何實現 provably fair 的博弈設計</li>
+        <div
+          className="mb-6 p-4 border rounded-lg"
+          style={{
+            backgroundColor: "var(--card-background)",
+            borderColor: "var(--border-color)",
+            boxShadow: "0 4px 6px var(--shadow-color)",
+          }}
+        >
+          <h2
+            className="font-semibold mb-2"
+            style={{ color: "var(--accent-gold)" }}
+          >
+            🔍 本遊戲學習目標與設計原理
+          </h2>
+          <ul
+            className="list-disc ml-5 space-y-1"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            <li>
+              理解 RNG（隨機數生成）+ Hash 機制如何實現 provably fair 的博弈設計
+            </li>
             <li>學習如何動態追蹤下注行為並計算 RTP</li>
             <li>了解賠付設計如何改變遊戲機率模型</li>
           </ul>
         </div>
 
         <p className="mb-2">💰 餘額：${balance.toFixed(2)}</p>
-        <p className="mb-4">🎯 運氣值累積：{currentSessionBet} / 門檻：{thresholdRef.current.toFixed(0)}</p>
+        <p className="mb-4">
+          🎯 運氣值累積：{currentSessionBet} / 門檻：
+          {thresholdRef.current.toFixed(0)}
+        </p>
 
         {cardInventory.length > 0 && (
           <div className="bg-yellow-50 border p-3 rounded mb-4">
@@ -166,12 +221,12 @@ function App() {
               {cardInventory.map((card, i) => (
                 <button
                   key={i}
-                  className={`px-3 py-1 rounded border text-sm ${activeCardIndex === i ? 'bg-green-500 text-white' : 'bg-white'}`}
+                  className={`px-3 py-1 rounded border text-sm ${activeCardIndex === i ? "bg-green-500 text-white" : "bg-white"}`}
                   onClick={() =>
                     setActiveCardIndex((prev) => (prev === i ? null : i))
                   }
                 >
-                  {card.cardName} {activeCardIndex === i ? '（使用中）' : ''}
+                  {card.cardName} {activeCardIndex === i ? "（使用中）" : ""}
                 </button>
               ))}
             </div>
@@ -184,7 +239,9 @@ function App() {
             min="1"
             max={balance}
             value={betAmount}
-            onChange={(e) => setBetAmount(Math.min(Number(e.target.value), balance))}
+            onChange={(e) =>
+              setBetAmount(Math.min(Number(e.target.value), balance))
+            }
             className="border p-1 w-full sm:w-24"
           />
           <div className="flex gap-2">
@@ -202,17 +259,21 @@ function App() {
 
         {result && (
           <p className="mb-4">
-            結果：你出了 {playerChoice}，系統出了 {systemChoice} →{' '}
-            {result === 'win' ? '你贏了！' : result === 'draw' ? '平手' : '你輸了！'}
+            結果：你出了 {playerChoice}，系統出了 {systemChoice} →{" "}
+            {result === "win"
+              ? "你贏了！"
+              : result === "draw"
+                ? "平手"
+                : "你輸了！"}
           </p>
         )}
 
         <h2 className="mt-6 mb-2 text-lg font-semibold">歷史紀錄</h2>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm table-auto border">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="border px-2 py-1">局數</th>
+          <table className="w-full text-sm table-auto border" >
+            <thead>
+              <tr style={{ color: "var(--accent-gold)" }}>
+                <th  className="border px-2 py-1">局數</th>
                 <th className="border px-2 py-1">玩家選擇</th>
                 <th className="border px-2 py-1">電腦選擇</th>
                 <th className="border px-2 py-1">下注額</th>
@@ -223,18 +284,29 @@ function App() {
               </tr>
             </thead>
             <tbody>
-              {history.slice(-10).reverse().map((h, i) => (
-                <tr key={i} className="text-center">
-                  <td className="border px-2 py-1">{h.round}</td>
-                  <td className="border px-2 py-1">{h.player}</td>
-                  <td className="border px-2 py-1">{h.system}</td>
-                  <td className="border px-2 py-1">${h.bet}</td>
-                  <td className="border px-2 py-1">{h.outcome === 'win' ? '贏' : h.outcome === 'draw' ? '和局' : '輸'}</td>
-                  <td className="border px-2 py-1">{h.bonus}</td>
-                  <td className="border px-2 py-1">${h.payout}</td>
-                  <td className="border px-2 py-1 break-all text-left">{h.hash}</td>
-                </tr>
-              ))}
+              {history
+                .slice(-10)
+                .reverse()
+                .map((h, i) => (
+                  <tr key={i} className="text-center">
+                    <td className="border px-2 py-1">{h.round}</td>
+                    <td className="border px-2 py-1">{h.player}</td>
+                    <td className="border px-2 py-1">{h.system}</td>
+                    <td className="border px-2 py-1">${h.bet}</td>
+                    <td className="border px-2 py-1">
+                      {h.outcome === "win"
+                        ? "贏"
+                        : h.outcome === "draw"
+                          ? "和局"
+                          : "輸"}
+                    </td>
+                    <td className="border px-2 py-1">{h.bonus}</td>
+                    <td className="border px-2 py-1">${h.payout}</td>
+                    <td className="border px-2 py-1 break-all text-left">
+                      {h.hash}
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
