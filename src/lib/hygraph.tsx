@@ -41,7 +41,7 @@ type PostBySlugResponse = {
 export async function getAllPosts() {
   const query = `
     {
-      posts(orderBy: date_DESC) {
+      posts(orderBy: date_DESC, first: 30) {
         title
         slug
         date
@@ -59,7 +59,7 @@ export async function getAllPosts() {
 export async function getPostSlugs() {
   const query = `
     {
-      posts {
+      posts(first: 30) {
         slug
       }
     }
@@ -81,10 +81,12 @@ export async function getPostBySlug(slug: string) {
         }
       }
     }
-  `
+  `;
 
   const variables = { slug }
   const data = await hygraph.request<PostBySlugResponse>(query, variables)
+
+  console.log(data)
 
   return {
     title: data.post.title,
