@@ -7,6 +7,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 
   const navItems = [
     { label: "首頁", href: "/" },
+    { label: "IP 查詢", href: "/ip" },
     { label: "剪刀石頭布遊戲", href: "/rps" },
     { label: "關於我", href: "/about" },
   ];
