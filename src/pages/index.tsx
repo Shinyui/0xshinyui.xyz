@@ -8,6 +8,7 @@ type Post = {
   slug: string;
   date: string;
   excerpt: string;
+  contentType: string
   coverImage: {
     url: string;
   } | null;
@@ -15,9 +16,21 @@ type Post = {
 
 type HomeProps = {
   posts: Post[];
+  tags: string[];
 };
 
-export default function Home({ posts }: HomeProps) {
+// 類別名稱轉換函數
+const getCategoryDisplayName = (category: string): string => {
+  const categoryMap: { [key: string]: string } = {
+    'pm': '產品管理',
+    'opt': '運營',
+    'dev': '程式開發',
+    'other': '其他'
+  };
+  return categoryMap[category] || category;
+};
+
+export default function Home({ posts, tags }: HomeProps) {
   return (
     <Layout>
       <h1
@@ -26,6 +39,50 @@ export default function Home({ posts }: HomeProps) {
       >
         最新文章
       </h1>
+
+      <div className="flex flex-wrap gap-2 mb-8">
+        <Link
+          href="/"
+          className="inline-block px-3 py-2 rounded-full text-sm font-medium border transition-all duration-300 hover:scale-105"
+          style={{
+            backgroundColor: "var(--card-background)",
+            borderColor: "var(--accent-gold)",
+            color: "var(--accent-gold)",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "var(--accent-gold)";
+            e.currentTarget.style.color = "var(--background)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "var(--card-background)";
+            e.currentTarget.style.color = "var(--accent-gold)";
+          }}
+        >
+          全部文章
+        </Link>
+        {tags.map((tag) => (
+          <Link
+              key={tag}
+              href={`/category/${encodeURIComponent(tag)}`}
+              className="inline-block px-3 py-2 rounded-full text-sm font-medium border transition-all duration-300 hover:scale-105"
+              style={{
+                backgroundColor: "var(--card-background)",
+                borderColor: "var(--accent-gold)",
+                color: "var(--accent-gold)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "var(--accent-gold)";
+                e.currentTarget.style.color = "var(--background)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "var(--card-background)";
+                e.currentTarget.style.color = "var(--accent-gold)";
+              }}
+            >
+              {getCategoryDisplayName(tag)}
+            </Link>
+        ))}
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {posts.map((post) => (
@@ -64,6 +121,16 @@ export default function Home({ posts }: HomeProps) {
                 </div>
               </Link>
             )}
+            <p 
+              className="inline-block mb-1 py-[4px] px-[8px] rounded text-[12px] font-medium"
+              style={{
+                backgroundColor: "var(--accent-gold)",
+                color: "var(--background)",
+                opacity: 0.9
+              }}
+            >
+                {getCategoryDisplayName(post.contentType)}
+              </p>
             <Link href={`/posts/${post.slug}`} className="block">
               <h2
                 className="text-lg font-semibold mb-1 transition-colors duration-300"
@@ -96,8 +163,17 @@ export default function Home({ posts }: HomeProps) {
 
 export async function getStaticProps() {
   const posts = await getAllPosts();
+  const allTags = Array.from(new Set(posts.map((post) => post.contentType)));
+  
+  // 排序：其他類別永遠在最後，其餘按字母順序
+  const tags = allTags.sort((a, b) => {
+    if (a === 'other') return 1;
+    if (b === 'other') return -1;
+    return a.localeCompare(b);
+  });
+  
   return {
-    props: { posts },
+    props: { posts, tags },
     revalidate: 60, // ISR：每 60 秒更新
   };
 }

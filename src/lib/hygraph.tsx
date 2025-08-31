@@ -17,6 +17,7 @@ type Post = {
   coverImage: {
     url: string
   }
+  contentType: string
 }
 
 type AllPostsResponse = {
@@ -33,6 +34,7 @@ type PostBySlugResponse = {
     date: string
     excerpt: string
     content: string
+    contentType: string
     coverImage: { url: string } | null
   }
 }
@@ -46,6 +48,7 @@ export async function getAllPosts() {
         slug
         date
         excerpt
+        contentType
         coverImage {
           url
         }
@@ -76,6 +79,7 @@ export async function getPostBySlug(slug: string) {
         date
         excerpt
         content
+        contentType
         coverImage {
           url
         }
@@ -85,8 +89,6 @@ export async function getPostBySlug(slug: string) {
 
   const variables = { slug }
   const data = await hygraph.request<PostBySlugResponse>(query, variables)
-
-  console.log(data)
 
   return {
     title: data.post.title,
