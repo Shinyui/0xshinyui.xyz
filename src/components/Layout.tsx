@@ -1,6 +1,7 @@
 import { ReactNode, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { Analytics } from "@vercel/analytics/next"
 
 export default function Layout({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -178,6 +179,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       {/* Main 區域 */}
       <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-10 flex-grow">
         {children}
+        <Analytics/>
       </main>
 
       {/* Footer 區域 */}
