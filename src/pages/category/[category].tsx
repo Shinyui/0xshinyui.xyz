@@ -28,6 +28,7 @@ const getCategoryDisplayName = (category: string): string => {
     'pm': '產品管理',
     'opt': '運營',
     'dev': '程式開發',
+    'edtech': "線上教育",
     'other': '其他'
   };
   return categoryMap[category] || category;
