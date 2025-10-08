@@ -192,7 +192,7 @@ export default function Post({ post }: PostProps) {
                 "--link-color": "var(--accent-gold)",
                 "--link-hover-color": "var(--accent-gold-dark)",
                 "--strong-color": "var(--text-primary)",
-                "--code-bg": "var(--hover-background)",
+                "--code-bg": "transparent",
                 "--code-color": "var(--accent-gold)",
                 "--pre-bg": "#000000",
                 "--pre-color": "var(--text-primary)",
