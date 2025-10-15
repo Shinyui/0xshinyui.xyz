@@ -22,9 +22,11 @@ export default async function handler(
   try {
     console.log('開始處理PDF壓縮請求');
     
-    // 確保temp目錄存在
-    const tempDir = path.join(process.cwd(), 'temp');
-    if (!fs.existsSync(tempDir)) {
+    // 使用 /tmp 目錄（在無伺服器環境中通常是可寫的）
+    const tempDir = process.env.NODE_ENV === 'production' ? '/tmp' : path.join(process.cwd(), 'temp');
+    console.log('使用臨時目錄:', tempDir);
+    
+    if (!fs.existsSync(tempDir) && process.env.NODE_ENV !== 'production') {
       console.log('創建temp目錄:', tempDir);
       fs.mkdirSync(tempDir, { recursive: true });
     }

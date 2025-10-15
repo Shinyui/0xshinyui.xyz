@@ -22,9 +22,10 @@ export default function handler(
       return res.status(400).json({ error: '無效的檔案名稱' });
     }
 
-    // 確保temp目錄存在
-    const tempDir = path.join(process.cwd(), 'temp');
-    if (!fs.existsSync(tempDir)) {
+    // 使用 /tmp 目錄（在無伺服器環境中通常是可寫的）
+    const tempDir = process.env.NODE_ENV === 'production' ? '/tmp' : path.join(process.cwd(), 'temp');
+    
+    if (!fs.existsSync(tempDir) && process.env.NODE_ENV !== 'production') {
       fs.mkdirSync(tempDir, { recursive: true });
     }
     
