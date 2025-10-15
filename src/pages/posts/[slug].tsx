@@ -254,32 +254,43 @@ export default function Post({ post }: PostProps) {
 export const getStaticPaths: GetStaticPaths = async () => {
   const posts = await getPostSlugs();
   const paths = posts.map((p) => ({ params: { slug: p.slug } }));
-  return { paths, fallback: false };
+  
+  // 改為 'blocking' 或 true 來支援動態生成
+  return { paths, fallback: 'blocking' };
 };
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-  const postData = await getPostBySlug(params!.slug as string);
+  try {
+    const postData = await getPostBySlug(params!.slug as string);
 
-  const processed = await remark()
-    .use(remarkGfm)
-    .use(remarkRehype)
-    .use(rehypeSlug)
-    .use(rehypeAutolinkHeadings)
-    .use(rehypeStringify)
-    .process(postData.content);
+    const processed = await remark()
+      .use(remarkGfm)
+      .use(remarkRehype)
+      .use(rehypeSlug)
+      .use(rehypeAutolinkHeadings)
+      .use(rehypeStringify)
+      .process(postData.content);
 
-  const tocData = toc(postData.content).json as TocItem[];
+    const tocData = toc(postData.content).json as TocItem[];
 
-  return {
-    props: {
-      post: {
-        title: postData.title,
-        date: postData.date,
-        excerpt: postData.excerpt,
-        contentHtml: processed.toString(),
-        coverImage: postData.coverImage,
-        toc: tocData,
+    return {
+      props: {
+        post: {
+          title: postData.title,
+          date: postData.date,
+          excerpt: postData.excerpt,
+          contentHtml: processed.toString(),
+          coverImage: postData.coverImage,
+          toc: tocData,
+        },
       },
-    },
-  };
+      // 可選：設置重新驗證時間（秒）
+      revalidate: 60, // 每60秒重新生成一次
+    };
+  } catch (error) {
+    // 如果文章不存在，返回 404
+    return {
+      notFound: true,
+    };
+  }
 };
