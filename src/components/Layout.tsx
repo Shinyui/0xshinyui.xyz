@@ -12,7 +12,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     { label: "IP 查詢", href: "/ip" },
     { label: "2FA 生成", href: "/2fa" },
     { label: "剪刀石頭布遊戲", href: "/rps" },
-    { label: "壓縮 PDF", href: "/pdf" },
+    { label: "OTC 換匯計算機", href: "/otc" },
     { label: "關於我", href: "/about" },
   ];
 
